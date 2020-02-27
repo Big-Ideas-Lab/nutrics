@@ -4,14 +4,13 @@ Welcome to the MoveIt! Backend Repository. We think that choosing nutritious, lo
 
 ##### Local Runtime Instructions: 
 
-
 ```
-git clone ''
-cd {folder_name}
+git clone 'https://github.com/joshuadrc/moveit_backend.git'
+cd moveit_backend
 pip3 install -r requirements.txt
 python3 main.py
 ```
-***Note: This will **not** run without clean_foods.csv in the repository. Ask jsd42@duke.edu for acccess.
+*** Note: This will **not** run without clean_foods.csv in the repository. Ask jsd42@duke.edu for acccess.
 
 ```
 Update 2.27.2020: Try these endpoints once you have flask running on a local server:
@@ -24,7 +23,7 @@ https://localhost/get_palate/<string>
 
 #### **Navigating our backend:**
 
-###main.py
+### main.py
 This file contains a Flask application. Think of it as the "hub" by which the other modules (Nutrition, Palate, Recommender, GeoLocal) connect and interact. main.py also interfaces with our Google Firestore, but more on that later.
 
 
