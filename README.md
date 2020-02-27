@@ -1,6 +1,6 @@
 ## MoveIt! Backend
 
-Welcome to the MoveIt! Backend Repository. We think that choosing nutritious, local food should be easy. If you're looking for one of our frontend development platforms, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or get updates on our mobile application development.
+Welcome to the MoveIt! Backend Repository. We think that choosing nutritious, local food should be easy. If you're looking for one of our frontend development platforms, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or our [mobile application development](https://github.com/Big-Ideas-Lab/moveit_appdev).
 
 ##### Local Runtime Instructions: 
 
