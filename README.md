@@ -1,11 +1,11 @@
 ## MoveIt! Backend
 
-Welcome to the MoveIt! Backend Repository. We think that choosing nutritious, local food should be easy, and we're building an application that does it for you. If you're looking one of our frontend development platform, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or our mobile application development.
+Welcome to the MoveIt! Backend Repository. We think that choosing nutritious, local food should be easy. If you're looking for one of our frontend development platforms, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or get updates on our mobile application development.
 
 ##### Local Runtime Instructions: 
 
 ```
-git clone 'https://github.com/joshuadrc/moveit_backend.git'
+git clone 'https://github.com/Big-Ideas-Lab/moveit_backend.git'
 cd moveit_backend
 pip3 install -r requirements.txt
 python3 main.py
