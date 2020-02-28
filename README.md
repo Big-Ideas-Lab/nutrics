@@ -29,8 +29,7 @@ Update 2.27.2020: Try these endpoints once you have flask running on a local ser
 
 ### main.py
 
-This file contains a Flask application. Think of it as the "hub" by which the other modules (Nutrition, Palate, Recommender, GeoLocal) connect and interact. main.py also interfaces with our Google Firestore, but more on that later.
-
+This file contains a Flask application. Think of it as the "hub" by which the other modules (Nutrition, Palate, Recommender, GeoLocal) connect and interact. main.py accepts and returns information to our Google Firestore where user data is held. 
 
 ### Nutrition.py
 

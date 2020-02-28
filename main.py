@@ -15,8 +15,9 @@ import json
 # Import local modules
 from Palate import Palate
 from Nutrition import Nutrients
-from GeoLocal import Nearby
-from Recommender import Recommender
+
+# from GeoLocal import Nearby
+# from Recommender import Recommender
 
 #Initialize application
 app = Flask(__name__)
@@ -34,18 +35,20 @@ def return_nutrients(string):
     return nuts.fast_filter(string)
 
 #Interface for palate module
-@app.route('/get_palate/<string>')
-def return_palate(string):
-    #Palate module has a method called "palette_constructor that decomposes foods into their palate signatures"
-    return pal.palette_constructor(string)
+
+# @app.route('/get_palate/<string>')
+# def return_palate(string):
+#     #Palate module has a method called "palette_constructor that decomposes foods into their palate signatures"
+#     return pal.palette_constructor(string)
 
 #Interface for recommendation model
-@app.route('get_recommendation/<json>')
-def return_recommendation(json):
-    candidates = Nearby(json['lat'], json['long'])
-    user_history = json['user_history']
-    sorted_recommendations = Recommender(candidates, user_history)
-    return sorted_recommendations
+
+# @app.route('get_recommendation/<json>')
+# def return_recommendation(json):
+#     candidates = Nearby(json['lat'], json['long'])
+#     user_history = json['user_history']
+#     sorted_recommendations = Recommender(candidates, user_history)
+#     return sorted_recommendations
 
 if __name__ == '__main__':
     #Do not use Flask in deployment. Set debug to False for real testing.
