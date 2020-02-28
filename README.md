@@ -73,4 +73,4 @@ We considered multiple platforms to build on, and tested iOS and React Native pr
 
 ### NLP Food Searching
 
-With the powerful backend API we are building, we can interface with different frontend products. One example was created by [Aman Ibrahim](https://github.com/orgs/Big-Ideas-Lab/people/amanmibra).
+With the powerful backend API we are building, we can interface with different frontend products. One example was created by [Aman Ibrahim](https://github.com/orgs/Big-Ideas-Lab/people/amanmibra) and can be found at this [repo](https://github.com/Big-Ideas-Lab/nutrics-search-webapp).
