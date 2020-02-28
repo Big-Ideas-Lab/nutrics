@@ -1,28 +1,31 @@
-## MoveIt! Backend
+![alt text](Logo.jpeg "Title")
 
-Welcome to the MoveIt! Backend Repository. We think that choosing nutritious, local food should be easy, and we're building an application that does it for you. If you're looking one of our frontend development platform, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or our mobile application development.
+Welcome to the Nutrics project. We think that choosing nutritious, local food should be easy, and we're building an application that does it for you. If you're looking one of our frontend development platform, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or our mobile application development.
 
-#####Local Runtime Instructions: 
+## Local Runtime Instructions: 
 
 
 ```
-git clone ''
-cd {folder_name}
+
+git clone 'https://github.com/Big-Ideas-Lab/moveit_backend.git'
+cd moveit_backend
 pip3 install -r requirements.txt
 python3 main.py
 ```
-***Note: This will **not** run without clean_foods.csv in the repository. Ask jsd42@duke.edu for acccess.
+
+Note: clean_foods.csv is not hosted on this GitHub page. We do not have permission to distribute this dataset, as it doesn't belong to us. Please contact a member of the BIG IDEAs Lab for permission to access this dataset.
 
 ```
+
 Update 2.27.2020: Try these endpoints once you have flask running on a local server:
 
-https://localhost/get_nutrients/<string>
-https://localhost/get_palate/<string>
+{localhost}/get_nutrients/<string>
+{localhost}/get_palate/<string>
 ```
 
 -------------
 
-####**Navigating our backend:**
+#### **Navigating our backend:**
 
 ###main.py
 This file contains a Flask application. Think of it as the "hub" by which the other modules (Nutrition, Palate, Recommender, GeoLocal) connect and interact. main.py also interfaces with our Google Firestore, but more on that later.
