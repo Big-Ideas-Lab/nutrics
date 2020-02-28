@@ -36,7 +36,7 @@ This file contains a Flask application. Think of it as the "hub" by which the ot
 
 This file contains two classes. The Nutrients class uses natural language processing to estimate the nutritional value of food, and uses **clean_foods.csv**, which we were lended by Duke Nutrition. The Nutrition_Score class takes those nutrition estimates and gives a score that is related to gender, age, and activity level.
 
-> Note: clean_foods.csv is not hosted on this GitHub page. We do not have permission to distribute this dataset, as it doesn't belong to us. Please ask jsd42@duke.edu for permission to access this dataset.
+> Note: clean_foods.csv is not hosted on this GitHub page. We do not have permission to distribute this dataset, as it doesn't belong to us. Please contact a member of the BIG IDEAs Lab for permission to access this dataset.
 
 ### Palate.py
 
