@@ -1,8 +1,8 @@
 ![alt text](Logo.png "Title")
 
-Welcome to the Nutrics project. We think that choosing nutritious, local food should be easy, and we're building an application that does it for you. If you're looking one of our frontend development platform, check out this [nutrition search engine](https://github.com/Big-Ideas-Lab/nutrics-search-webapp) or our mobile application development.
+Welcome to the Nutrics project. We think that choosing nutritious, local food should be easy, and we're building an application that does it for you.
 
-## Local Runtime Instructions:
+## Local API Runtime Instructions:
 
 
 ```
