@@ -1,1 +1,4 @@
 clean_foods.csv
+dconf
+env
+__pycache__
