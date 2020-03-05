@@ -9,7 +9,7 @@ Welcome to the Nutrics project. We think that choosing nutritious, local food sh
 
 git clone 'https://github.com/Big-Ideas-Lab/nutrics.git'
 cd nutrics
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 python3 main.py
 ```
 
