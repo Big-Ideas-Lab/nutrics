@@ -39,7 +39,7 @@ def return_nutrients(string):
 @app.route('/get_palate/<string>')
 def return_palate(string):
     #Palate module has a method called "palette_constructor that decomposes foods into their palate signatures"
-    return pal.palette_constructor(string)
+    return pal.palate_constructor(string)
 
 #Interface for recommendation model
 

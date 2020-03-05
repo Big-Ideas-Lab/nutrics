@@ -32,7 +32,7 @@ class Palate:
             self.flavors = pickle.load(handle)
 
 
-    def palette_constructor(self,food_string):
+    def palate_constructor(self,food_string):
 
         #Our dictionary is not exhaustive, and this function will skip over unknown foods / mispellings
         def attempt_cos(single_food, single_flavor):

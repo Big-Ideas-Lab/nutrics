@@ -69,6 +69,23 @@ class Nutrients:
 
         return base
 
+    def best_NLP_guess(self,string): 
+        string_array = string.split()
+        try:
+            string_array.remove('and')
+        except:
+            pass
+
+        vector = self.get_vector_from_array(string_array)
+        match, row = self.tree.query(vector)
+        match = 1 - match
+
+        data = self.df.iloc[row]
+
+        json_data = json.dumps(dict(zip(list(data.keys()[1:]), list(data.values[1:]))))
+        return json_data
+
+
     #This is filtering search approach that needs to be optimized in the future. 
     #This method will find the longest matching strings that we have in our database
     def fast_filter(self, string): 

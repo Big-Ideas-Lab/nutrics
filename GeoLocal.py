@@ -37,8 +37,8 @@ class Location:
     #     data = json.loads(response.content.decode('utf-8'))
 
     def return_dummy(self): 
-        dummy1 = list(json.loads(self.pal.palette_constructor('cheeseburger with fries'))[0].values())
-        dummy2 = list(json.loads(self.pal.palette_constructor('kale salad'))[0].values())
-        dummy3 = list(json.loads(self.pal.palette_constructor('strawberry smoothie'))[0].values())
+        dummy1 = list(json.loads(self.pal.palate_constructor('cheeseburger with fries'))[0].values())
+        dummy2 = list(json.loads(self.pal.palate_constructor('kale salad'))[0].values())
+        dummy3 = list(json.loads(self.pal.palate_constructor('strawberry smoothie'))[0].values())
 
         return [dummy1,dummy2,dummy3]
