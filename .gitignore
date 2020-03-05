@@ -1,5 +1,11 @@
+#Private data
 clean_foods.csv
+
+#Generated files
 dconf
 env
 __pycache__
 DS_Store
+
+#ENV VARS
+.env
