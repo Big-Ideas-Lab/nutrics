@@ -90,10 +90,10 @@ if __name__ == "__main__":
     pal = Palate()
     # Creating 3 dummy data for userHx, you will probably need to create more
     user_liked = ['cheeseburger', 'french fries', 'steak']
-    userHx = [pal.palette_constructor(liked) for liked in user_liked]
+    userHx = [pal.palate_constructor(liked) for liked in user_liked]
     # Creating 3 dummy data for CandidateValues, you will probably need to
     # create more
     available_local = ['kale', 'cheeseburger', 'fruit smoothie']
-    candidates = [pal.palette_constructor(available) for available in
+    candidates = [pal.palate_constructor(available) for available in
                   available_local]
     main(candidates, userHx)
