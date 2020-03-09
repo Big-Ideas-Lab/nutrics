@@ -73,3 +73,16 @@ We considered multiple platforms to build on, and tested iOS and React Native pr
 ### NLP Food Searching
 
 With the powerful backend API we are building, we can interface with different frontend products. One example was created by [Aman Ibrahim](https://github.com/orgs/Big-Ideas-Lab/people/amanmibra) and can be found at this [repo](https://github.com/Big-Ideas-Lab/nutrics-search-webapp).
+
+------------
+
+## MVP To Do (Backend): 
+- [ ] Connect GeoLocal Module to Nutritionix API
+- [ ] Connect Recommender Module to Firestore through Firebase Functions
+- [ ] Update Recommender Module for single analysis
+- [ ] Wrap in non-Flask Application for production server
+
+## MVP To Do (Frontend): 
+- [ ] Develop non-connected widgets to specification designed [here.](https://gallery.io/projects/MCHbtQVoQ2HCZYjYt-pwv8Nr/files/MCHXG950YxofXVKr92LnNIc6)
+- [ ] Connect frontend application to Firestore
+- [ ] Establish secure login methods
