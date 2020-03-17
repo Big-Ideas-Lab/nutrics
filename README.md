@@ -82,7 +82,36 @@ With the powerful backend API we are building, we can interface with different f
 - [ ] Update Recommender Module for single analysis
 - [ ] Wrap in non-Flask Application for production server
 
+
 ## MVP To Do (Frontend): 
 - [ ] Develop non-connected widgets to specification designed [here.](https://gallery.io/projects/MCHbtQVoQ2HCZYjYt-pwv8Nr/files/MCHXG950YxofXVKr92LnNIc6)
 - [ ] Connect frontend application to Firestore
-- [ ] Establish secure login methods
+- [ ] Establish secure login methods 
+
+<!-- ## Nice to have: 
+- [ ] Enhance NLP model with food blogs -->
+
+<!-- ## Future Projects
+
+Phase 0a (What we already have):
+- A limited food database
+- A working recommendation model for nutritious food items
+- A nutrition content estimator based on semantic relationships and deep learning
+- Cloud architecture that responds to a mobile application
+- Progressing user interface design created in collaboration with a UX designer and behavioral economist
+ Phase 0b (What we are currently working on): 
+- Building and scaling our database with an online server (Limiting factor: $$ for quality managed databases)
+- Using deep and reinforcement learning to improve our recommendation model (Limiting factor: Time to develop)
+- Submitting our nutrition estimator to MLHC for external validation (Limiting factor: Time to publish)
+- Refining the cloud architecture (Limiting factor: Time to refine and $$ for managed services)
+- Building the mobile application itself (Limiting factor: Time for quality and data security, $$ for development time and server costs)
+- IRB Approval (Limiting factor: OIT and ISO approval)
+ Phase 1 (Summer 2020):
+A mobile application that tracks Duke employees at high risk for cardiometabolic disease and offers real-time suggestions for nutritious options on Duke's campus. 
+ Phase 2 (Late Fall 2020):
+Offer our application to members of the wider Durham community and offer real-time suggestions for nearby nutritious options in restaurants.
+Phase 3 (Summer 2021):
+Expand our application to grocery stores and at-home meals in Durham using the data we get from Phase 1 and 2 on eating habits. 
+Phase 4 (By Spring 2022):
+Expand our application nationally, and then globally with the help of DGHI expertise and local communities. Our database is designed to be scalable and extensible, and our recommendation model will be adaptable to preferences. We expect there to be many unforeseen challenges in a global rollout (connectivity, access to food data, and GPS capability of note), but through early and careful planning, we can start addressing these challenges early.  -->
+
