@@ -1,5 +1,5 @@
 clean_foods.csv
 dconf
-env
+.env
 __pycache__
 DS_Store

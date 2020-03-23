@@ -1,5 +1,10 @@
 from scipy.spatial.distance import cosine
+from numpy import mean
 from Palate import Palate
+from GeoLocal import LocalFinder
+import json
+import math
+
 
 '''
 This module is designed to be a simple implementation of our recommendation model, based on cosine distances.
@@ -7,93 +12,79 @@ This module is designed to be a simple implementation of our recommendation mode
 Created by Joshua D'Arcy, Sabrina Qi, and Aman Ibrahim on 2/27/2020
 '''
 
+uhx = ['steak sandwhich', 'chicken caesar salad', 'apple pie']
+ulat = 36.0087356
+ulon = -78.9448293
 
-class Recommend:
-    '''
-    Inputs:
-        1. User History of Liked Palate Vectors - {UserHx}
+class Recommend: 
 
-        2. Candidate Table - {candidates}
+    def __init__(self, user_hx_arg, latitude, longitude):
+        self.user_hx = user_hx_arg
+        self.latitude = latitude
+        self.longitude = longitude
+        self.distance = .1
 
-    Process:
+        self.seek_local()
+        self.palatize()
+        self.ranking()
 
-        1. Compare each value in {UserHx} to each value in {Candidates} using cosine distance
-
-        2. Sort closest matches in area
-
-    Outputs:
-        1. Return Top 5 closest matches. JSON file should be structured as:
-
-        [{Recommendation_1:
-            - Candidate food name
-            - Candidate food vector
-            - UserHx food name
-            - UserHx food vector
-            - cosine distance between Candidate food vector and UserHx food vector},
-        {...},
-        {...},
-        {...},
-        {...}]
-    '''
-
-    def __init__(self, user_Hx_arg, candidates_arg):
-        self.userHx = user_Hx_arg
-        self.candidates = candidates_arg
-
-    def calculate_cosine_distance(self):
-        all_dist = {}
-        for candidate in self.candidates:
-            cand_dist = [cosine(hist, candidate) for hist in self.userHx]
-            all_dist[candidate] = cand_dist
-        return all_dist  # this is a dictionary of lists
-
-    def avg_distance(self):
-        all_dist = self.calculate_cosine_distance()
-        avg_dist_all_cand = {}
-        for candidate, cand_dist in all_dist.items():
-            avg_dist = mean(cand_dist)
-            avg_dist_all_cand[candidate] = avg_dist
-        return avg_dist_all_cand  # this is a dictionary of average distances
+    #Use LocalFinder to find local candidates
+    def seek_local(self):
+        self.local_candidates = LocalFinder(self.latitude, self.longitude, self.distance).candidates
+        self.local_items = list(self.local_candidates.keys())
+    
+    #Use Palate to convert local candidates / user history to palate vectors
+    def palatize(self): 
+        pal = Palate()
+        self.local_matrix = [pal.palate_constructor(local) for local in self.local_items]
+        self.user_matrix = [pal.palate_constructor(usx) for usx in self.user_hx]
 
     def ranking(self):
-        avg_dist_all_cand = self.avg_distance()
-        sorted_candidates = sorted(avg_dist_all_cand,
-                                   key=avg_dist_all_cand.__getitem__)
-        top_five = sorted_candidates[0:4]
-        return top_five
+        i=0
+        for user_item in self.user_matrix: 
+            matches = [cosine(user_item, local_item) for local_item in self.local_matrix]
+            best_match = min(matches)
+            
+            index_match = matches.index(best_match)
+
+            #give a percent match (not really a percent but still)
+            percent = int(round((1-best_match)**8,2) * 100)
+
+            name = self.local_items[index_match]
+            restaurant = self.local_candidates[name]['restaurant']
+            price = self.local_candidates[name]['price']
+            distance = round(self.find_distance(self.local_candidates[name]['latitude'], self.local_candidates[name]['longitude']), 2)
+        
+            print(f'Because you liked {self.user_hx[i]}, you may also like {name} at {restaurant} ({percent}% match, only {distance}m away.)')
+            i+=1
+
+    def find_distance(self, lat2, lon2): 
+
+        #radius of earth
+        R = 6373.0
+
+        #lat1 / lat2
+        lat1 = math.radians(self.latitude)
+        lon1 = math.radians(self.longitude)
+
+        #find deltas
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+
+        #Haversine formula 
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        distance = R * c
+
+        return distance
+
+if __name__ == '__main__':
+    rec = Recommend(uhx, ulat, ulon)
+    # print(rec.local_items)
+    # print(rec.local_palate)
+    # print(rec.user_hx)
+    # print(rec.user_palate)
 
 
-def main(candidates, userHx):
-    recommender = Recommend(user_Hx_arg=userHx, candidates_arg=candidates)
-    recommendations = recommender.ranking()
-    avg_dist_all_cand = recommender.avg_distance()
-    i = 0
-    recommendation_list = []
-    for rec in recommendations:
-        ind = available_local.index[rec]
-        vector = candidates[ind]
-        avg_dist = avg_dist_all_cand[vector]
-        rec_dict = {"Recommendation_{}".format(i): {"Food Name": rec,
-                                                    "Food Vector":
-                                                        vector,
-                                                    "Avg Cosine "
-                                                    "Distance": avg_dist}}
-        recommendation_list.append(rec_dict)
-        i += 1
-    out_file = open("recommendations.json", "w")
-    json.dump(recommendation_list, out_file)
-    out_file.close()
-    return
 
-
-if __name__ == "__main__":
-    pal = Palate()
-    # Creating 3 dummy data for userHx, you will probably need to create more
-    user_liked = ['cheeseburger', 'french fries', 'steak']
-    userHx = [pal.palate_constructor(liked) for liked in user_liked]
-    # Creating 3 dummy data for CandidateValues, you will probably need to
-    # create more
-    available_local = ['kale', 'cheeseburger', 'fruit smoothie']
-    candidates = [pal.palate_constructor(available) for available in
-                  available_local]
-    main(candidates, userHx)
+    
