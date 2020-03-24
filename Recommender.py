@@ -12,17 +12,15 @@ This module is designed to be a simple implementation of our recommendation mode
 Created by Joshua D'Arcy, Sabrina Qi, and Aman Ibrahim on 2/27/2020
 '''
 
-uhx = ['steak sandwhich', 'chicken caesar salad', 'apple pie']
-ulat = 36.0087356
-ulon = -78.9448293
-
 class Recommend: 
 
-    def __init__(self, user_hx_arg, latitude, longitude):
+    def __init__(self, user_hx_arg, latitude, longitude, distance):
         self.user_hx = user_hx_arg
         self.latitude = latitude
         self.longitude = longitude
-        self.distance = .1
+        self.distance = distance
+
+        self.rec_dict = {}
 
         self.seek_local()
         self.palatize()
@@ -43,19 +41,29 @@ class Recommend:
         i=0
         for user_item in self.user_matrix: 
             matches = [cosine(user_item, local_item) for local_item in self.local_matrix]
-            best_match = min(matches)
+
             
+            best_match = min(matches)
+            self.rec_dict[f'rec_{i}'] = {}
+
+
             index_match = matches.index(best_match)
 
             #give a percent match (not really a percent but still)
             percent = int(round((1-best_match)**8,2) * 100)
 
             name = self.local_items[index_match]
-            restaurant = self.local_candidates[name]['restaurant']
-            price = self.local_candidates[name]['price']
-            distance = round(self.find_distance(self.local_candidates[name]['latitude'], self.local_candidates[name]['longitude']), 2)
-        
-            print(f'Because you liked {self.user_hx[i]}, you may also like {name} at {restaurant} ({percent}% match, only {distance}m away.)')
+
+            self.rec_dict[f'rec_{i}']['item'] = name
+            self.rec_dict[f'rec_{i}']['percet_match'] = percent
+            self.rec_dict[f'rec_{i}']['restaurant'] = self.local_candidates[name]['restaurant']
+            self.rec_dict[f'rec_{i}']['price'] = self.local_candidates[name]['price']
+            self.rec_dict[f'rec_{i}']['distance'] = round(self.find_distance(self.local_candidates[name]['latitude'], self.local_candidates[name]['longitude']), 2)
+            self.rec_dict[f'rec_{i}']['previous_match'] = self.user_hx[i]
+
+
+            # print(f'Because you liked {self.user_hx[i]}, you may also like {name} at {restaurant} ({percent}% match, only {distance}m away)')
+
             i+=1
 
     def find_distance(self, lat2, lon2): 
@@ -78,12 +86,12 @@ class Recommend:
 
         return distance
 
-if __name__ == '__main__':
-    rec = Recommend(uhx, ulat, ulon)
-    # print(rec.local_items)
-    # print(rec.local_palate)
-    # print(rec.user_hx)
-    # print(rec.user_palate)
+# if __name__ == '__main__':
+#     rec = Recommend(uhx, ulat, ulon)
+#     # print(rec.local_items)
+#     # print(rec.local_palate)
+#     # print(rec.user_hx)
+#     # print(rec.user_palate)
 
 
 

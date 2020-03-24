@@ -9,15 +9,14 @@ import numpy as np
 import pickle
 from scipy import spatial
 from flask import Flask
+from flask import request
 import requests
 import json
 
 # Import local modules
 from Palate import Palate
 from Nutrition import Nutrients
-
-# from GeoLocal import Nearby
-# from Recommender import Recommender
+from Recommender import Recommend
 
 #Initialize application
 app = Flask(__name__)
@@ -39,17 +38,23 @@ def return_nutrients(string):
 @app.route('/get_palate/<string>')
 def return_palate(string):
     #Palate module has a method called "palette_constructor that decomposes foods into their palate signatures"
-    return pal.palate_constructor(string)
+    stringify = str(pal.palate_constructor(string))
+    return stringify
 
 #Interface for recommendation model
 
-# @app.route('get_recommendation/<json>')
-# def return_recommendation(json):
-#     candidates = Nearby(json['lat'], json['long'])
-#     user_history = json['user_history']
-#     sorted_recommendations = Recommender(candidates, user_history)
-#     return sorted_recommendations
+@app.route('/get_rec', methods=['POST'])
+def return_recommendation():
+    json_file = request.json
+    uhx = json_file["user_hx"]
+    ulat = json_file["latitude"]
+    ulon = json_file["longitude"]
+    udis = json_file["distance"]
+
+    recommendation = Recommend(uhx, ulat, ulon, udis)
+    return recommendation.rec_dict
 
 if __name__ == '__main__':
     #Do not use Flask in deployment. Set debug to False for real testing.
     app.run(host='127.0.0.1', port=8080, debug=True)
+ 
