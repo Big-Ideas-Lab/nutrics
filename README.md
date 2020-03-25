@@ -21,6 +21,10 @@ Update 2.27.2020: Try these endpoints once you have flask running on a local ser
 
 {localhost}/get_nutrients/<string>
 {localhost}/get_palate/<string>
+
+Update 3.25.2020: This endpoint allows you to use the GeoLocal and Recommender Modules to find local foods tailored to your palate. It requires a post API call with a .json file. 
+
+{localhost}/get_rec/<json>
 ```
 
 -------------

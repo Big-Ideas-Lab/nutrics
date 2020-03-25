@@ -4,7 +4,7 @@ from Palate import Palate
 from GeoLocal import LocalFinder
 import json
 import math
-
+import datetime
 
 '''
 This module is designed to be a simple implementation of our recommendation model, based on cosine distances.
@@ -15,16 +15,28 @@ Created by Joshua D'Arcy, Sabrina Qi, and Aman Ibrahim on 2/27/2020
 class Recommend: 
 
     def __init__(self, user_hx_arg, latitude, longitude, distance):
+
+        ts1 = datetime.datetime.now().timestamp()
         self.user_hx = user_hx_arg
         self.latitude = latitude
         self.longitude = longitude
         self.distance = distance
-
         self.rec_dict = {}
 
+        ts2 = datetime.datetime.now().timestamp()
+        print("time to init: " + str(ts2 - ts1) + "seconds")
+
         self.seek_local()
+        ts3 = datetime.datetime.now().timestamp()
+        print("time to local: " + str(ts3 - ts2) + "seconds")
+
         self.palatize()
+        ts4 = datetime.datetime.now().timestamp()
+        print("time to palatize: " + str(ts4 - ts3) + "seconds")
+
         self.ranking()
+        ts5 = datetime.datetime.now().timestamp()
+        print("time to rank: " + str(ts5 - ts4) + "seconds")
 
     #Use LocalFinder to find local candidates
     def seek_local(self):
@@ -55,7 +67,7 @@ class Recommend:
             name = self.local_items[index_match]
 
             self.rec_dict[f'rec_{i}']['item'] = name
-            self.rec_dict[f'rec_{i}']['percet_match'] = percent
+            self.rec_dict[f'rec_{i}']['percent_match'] = percent
             self.rec_dict[f'rec_{i}']['restaurant'] = self.local_candidates[name]['restaurant']
             self.rec_dict[f'rec_{i}']['price'] = self.local_candidates[name]['price']
             self.rec_dict[f'rec_{i}']['distance'] = round(self.find_distance(self.local_candidates[name]['latitude'], self.local_candidates[name]['longitude']), 2)
@@ -86,12 +98,6 @@ class Recommend:
 
         return distance
 
-# if __name__ == '__main__':
-#     rec = Recommend(uhx, ulat, ulon)
-#     # print(rec.local_items)
-#     # print(rec.local_palate)
-#     # print(rec.user_hx)
-#     # print(rec.user_palate)
 
 
 
