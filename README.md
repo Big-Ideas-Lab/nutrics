@@ -82,9 +82,9 @@ With the powerful backend API we are building, we can interface with different f
 ------------
 
 ## MVP To Do (Backend): 
-- [ ] Connect GeoLocal Module to Nutritionix API
+- [x] Connect GeoLocal Module to Nutritionix API
 - [ ] Connect Recommender Module to Firestore through Firebase Functions
-- [ ] Update Recommender Module for single analysis
+- [x] Update Recommender Module for single analysis
 - [ ] Wrap in non-Flask Application for production server
 
 
