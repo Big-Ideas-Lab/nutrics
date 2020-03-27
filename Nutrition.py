@@ -135,17 +135,37 @@ class Nutrients:
         return json_strings
 
 class Nutrition_Score: 
-    #Score menu item
-    #---------------------------------------------------------------------------------------------
-    def nutrientScore(nutrition_info, recommended_dict_i):
+
+    def __init__(self,age, gender, activity, food):
+        
+        self.age = age
+        self.gender = gender
+        self.activity = activity
+
+        self.recommended = self.recommended_dict()
+        # to_score = Nutrients().fast_filter(food)
+        self.score = self.nutrientScore(food, self.recommended)
+
+    # #Score menu item
+    # #---------------------------------------------------------------------------------------------
+    def nutrientScore(self, nutrition_info, recommended_dict_i):
+        #convert to json file
+        nutrition_info = json.loads(nutrition_info)
+    
+
+
         recDict = recommended_dict_i
-        nutrient_sum_dict={'cal':0,'sugars':0,'totfat':0,'unsatfat':0,'satfat':0,'transfat':0,'carbs':0,'protein':0,'fiber':0,'sod':0,'mag':0,'totfolate':0,'potass':0,'vd':0}
+
+
+        nutrient_sum_dict={"carbohydrates": 0, "sugar": 0, "total_fats": 0, "sat_fats": 0, "protein": 0, "fiber": 0, "calories": 0, "cholesterol": 0, "potassium": 0, "sodium": 0, "calcium": 0, "magnesium": 0}
         nutrient_fracs={}
-        for ingredient_key in nutrition_info:
-            nutrition_dict_for_ingredient = nutrition_info[ingredient_key]
-            for nutrient in nutrition_dict_for_ingredient:
-                ingredient_nutrient_value = nutrition_dict_for_ingredient[nutrient]
-                nutrient_sum_dict[nutrient] = nutrient_sum_dict[nutrient]+ingredient_nutrient_value
+
+        for ingredient in nutrition_info:
+            for nutrient in ingredient:
+                try: 
+                    nutrient_sum_dict[nutrient] = nutrient_sum_dict[nutrient] + ingredient[nutrient] 
+                except: 
+                    pass
 
         for nutrient in nutrient_sum_dict:
             goal = recDict[nutrient]
@@ -154,7 +174,7 @@ class Nutrition_Score:
             nutrient_fracs[nutrient] = frac
 
         # select weights for each adequacy and moderation for each nutrient
-        weight_adequacy, weight_moderation = weight(recDict)
+        weight_adequacy, weight_moderation = self.weight(recDict)
 
         # Scoring
         nutrient_scores_adequacy= {}
@@ -182,12 +202,24 @@ class Nutrition_Score:
         moderation = sum(nutrient_scores_moderation.values())
         score = adequacy + moderation # a more positive score is better
 
-        return score
+        if score <= 0: 
+            score = 0
+        if score > 0 and score < 30:
+            score = score / 30
+        if score >= 30: 
+            score = 1
+
+
+        return str(score)
 
     # Generate the recommended nutritional intake depending on gender and activity
     #---------------------------------------------------------------------------------------------
 
-    def recommended_dict(gender, activity, age):
+    def recommended_dict(self):
+        gender = self.gender
+        age = self.age
+        activity = self.activity
+
         if gender == 0:
             if activity == 0:
                 if  age >=16 and age <=18:
@@ -245,7 +277,7 @@ class Nutrition_Score:
                 elif age >= 76:
                     cals = 2400;percent_totfat = .27;protein = 56;fiber = 28
 
-            recommended_dict = {'cal':cals/3,'sugars':.09*cals/3,'totfat': percent_totfat*cals/3,'satfat':.06*cals/3, 'chol':150/3,'carbs':.55*cals/3,'protein':protein/3,'fiber':fiber/3,'sod':2300/3,'mag':420/3,'potass':4700/3,'calcium':1250/3} #'totfolate':400/3,'transfat':.01*cals/3,
+            recommended_dict = {'calories':cals/3,'sugar':.09*cals/3,'total_fats': percent_totfat*cals/3,'sat_fats':.06*cals/3,'cholesterol':150/3,'carbohydrates':.55*cals/3,'protein':protein/3,'fiber':fiber/3,'sodium':2300/3,'magnesium':420/3,'potassium':4700/3,'calcium':1250/3} #'totfolate':400/3,'transfat':.01*cals/3,
 
         elif gender == 1:
             if activity == 0:
@@ -292,77 +324,35 @@ class Nutrition_Score:
                 elif age>60:
                     cals = 2000;percent_totfat = .27;fiber = 22.4
 
-            recommended_dict = {'cal':cals/3,'sugars':.09*cals/3,'totfat': percent_totfat*cals/3,'satfat':.06*cals/3,'chol':150/3,'carbs':.55*cals/3,'protein':46/3,'fiber':fiber/3,'sod':2300/3,'mag':320/3,'potass':4700/3,'calcium':1250/3} #'transfat':.01*cals/3,'totfolate':400/3,'vd':600/3,
-
+            recommended_dict = {'calories':cals/3,'sugar':.09*cals/3,'total_fats': percent_totfat*cals/3,'sat_fats':.06*cals/3,'cholesterol':150/3,'carbohydrates':.55*cals/3,'protein':46/3,'fiber':fiber/3,'sodium':2300/3,'magnesium':320/3,'potassium':4700/3,'calcium':1250/3} #'transfat':.01*cals/3,'totfolate':400/3,'vd':600/3,
+        
         else:
-            recommended_dict = {'cal':2400/3,'sugars':.09*2400/3,'totfat': .27*2400/3,'satfat':.06*2400/3,'chol':150/3,'carbs':.55*cals/3,'protein':46/3,'fiber':25.2/3,'sod':2300/3,'mag':320/3,'potass':4700/3,'calcium':1250/3} #'totfolate':400/3,'transfat':.01*2400/3,'vd':600/3,
+            recommended_dict = {'calories':2400/3,'sugar':.09*2400/3,'total_fats': .27*2400/3,'sat_fats':.06*2400/3,'cholesterol':150/3,'carbohydrates':.55*cals/3,'protein':46/3,'fiber':25.2/3,'sodium':2300/3,'magnesium':320/3,'potassium':4700/3,'calcium':1250/3} #'totfolate':400/3,'transfat':.01*2400/3,'vd':600/3,
+        
         return recommended_dict
 
 
-    def score_local_meals_per_user(radius,lat,long,gender,activity,age):
-        #Collect options in the area.
-        
-        #bring in JSON data herea / connect to FIREBASE here.
-
-        print("Restaurants Collected.")
-        #Optimal recommended dictionary construction, will need to move this outside function in future
-        recommended_dictionary = recommended_dict(gender=gender,activity=activity,age=age)
-
-        #Add in nutritional values for each item in dictionary
-        for restaurant in restaurants:
-            menu = restaurant['Menu']
-            counter = 0
-            for item in menu:
-                menu[counter]['Score'] = nutrientScore(single_dictionary(item)['nutrition'],recommended_dictionary)
-                counter +=1
-
-                if counter == 5:
-                    print("Nutritional information obtained from {}.".format(restaurant['Name']))
-                    break
-
-        for restaurant in restaurants:
-            menu = restaurant['Menu']
-            counter = 0
-            for item in menu:
-                try:
-                    print('Restaurant: {} ({})\nItem: {}\nScore: {}'.format(restaurant['Name'],restaurant['Location'],item['item'], item['Score']))
-                except:
-                    continue
-
-    def weight(recDict):
+    def weight(self, recDict):
         switcher = {
-        'cal': (2,3),
-        'sugars': (1,3),
-        'totfat': (1,3),
+        'calories': (2,3),
+        'sugar': (1,3),
+        'total_fats': (1,3),
         'unsatfat': (2,2),
-        'satfat': (1,3),
+        'sat_fats': (1,3),
         'transfat': (1,3),
-        'carbs': (2,3),
+        'carbohydrates': (2,3),
         'protein': (2,3),
         'fiber': (3,1),
-        'sod': (1,3),
-        'mag': (2,1),
+        'sodium': (1,3),
+        'magnesium': (2,1),
         'totfolate': (2,1),
-        'potass': (2,1),
+        'potassium': (2,1),
         'vd': (2,1),
+        'cholesterol': (1,1), 
+        'calcium': (1,1)
         }
         weight_adequacy = {} #{'nutrient': weight_value, etc}
         weight_moderation = {}
         for nutrient in recDict:
             weight_adequacy[nutrient], weight_moderation[nutrient] = switcher[nutrient]
         return weight_adequacy, weight_moderation
-
-
-    #Return dictionary of nutrient values per ingredient per food item
-    #---------------------------------------------------------------------------------------------
-
-    def single_dictionary(menu_item):
-        ingredients_list = menu_item['ingredients']
-        #create new dict
-        menu_item['nutrition'] = {}
-        for ingredient in ingredients_list:
-            try:
-                menu_item['nutrition'][ingredient] = nutri_search(ingredient,df)
-            except:
-                continue
-        return menu_item

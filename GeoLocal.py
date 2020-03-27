@@ -13,40 +13,55 @@ load_dotenv()
 
 class LocalFinder:
 
+    #Inititialize class
     def __init__(self, lat, lon, distance):
         self.lat = lat
         self.lon = lon
         self.distance = distance
 
-        self.headers = {'x-rapidapi-host': os.environ["XYZ-APP-ID"],'x-rapidapi-key': os.environ["XYZ-APP-KEY"]}
+        #Pull headers from .env file
+        self.headers_V2 = {'x-app-id': os.environ["ID"],'x-app-key': os.environ["KEY"]}
+        self.headers_V1 = {'appId': os.environ["ID"],'appKey': os.environ["KEY"]}
 
+        #Collect local restaurants
         self.ids = self.get_restaurants()
 
+        #Collect menu data from local restaurants
         self.candidates = self.get_menus()
 
-
+    #Collect local restaurant IDs
     def get_restaurants(self):
-        url = "https://us-restaurant-menus.p.rapidapi.com/restaurants/search/geo"
-        querystring = {"page":"1","lon":self.lon,"lat":self.lat,"distance":self.distance}
-        response = requests.request("GET", url, headers=self.headers, params=querystring)
-        r_data = json.loads(response.content.decode('utf-8'))
 
-        ids = [data['restaurant_id'] for data in r_data['result']['data']] 
-
+        PARAMS = {'ll':f'{self.lat},{self.lon}', 'distance':f'{self.distance}'}
+        r = requests.get('https://trackapi.nutritionix.com/v2/locations', params=PARAMS,headers=self.headers_V2)
+        r_data = r.json()
+        ids = [loc['brand_id'] for loc in r_data['locations']]
         return ids
 
+    #Collect menu data from local restaurants, based on restaurant IDs
     def get_menus(self):
 
         menu_dict = {}
         for id in self.ids:  
-            url = f"https://us-restaurant-menus.p.rapidapi.com/restaurant/{id}/menuitems"
-            querystring = {"page":"1"}
-            response = requests.request("GET", url, headers=self.headers, params=querystring)
-            r_data = json.loads(response.content.decode('utf-8'))
+            json_post = {
+                "appId":os.environ["ID"],
+                "appKey":os.environ["KEY"],
+                "offset":0, 
+                "limit":50,
+                "filters":{
+                    "brand_id": f"{id}" 
+                    }, 
+                # "sort":{
+                #     "field":"_score",
+                #     "order":"desc"
+                # }
+                }
+            r = requests.post('https://api.nutritionix.com/v1_1/search', json=json_post)
+            r_data = r.json()
+    
+            for m_item in r_data['hits']:
 
-            for m_item in r_data['result']['data']:
-
-                item = m_item['menu_item_name']
+                item = m_item['fields']['item_name']
                 menu_dict[item] = {}
 
                 try:
@@ -60,7 +75,7 @@ class LocalFinder:
                     menu_dict[item]['longitude'] = ''
 
                 try:
-                    menu_dict[item]['restaurant'] = m_item['restaurant_name']
+                    menu_dict[item]['restaurant'] = m_item['fields']['brand_name']
                 except:
                     menu_dict[item]['restaurant'] = ''
 
@@ -73,7 +88,5 @@ class LocalFinder:
                     menu_dict[item]['price'] = m_item['menu_item_pricing'][0]['price']
                 except: 
                     menu_dict[item]['price'] = ''
-
-
 
         return menu_dict

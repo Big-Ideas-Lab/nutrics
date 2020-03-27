@@ -16,6 +16,7 @@ import json
 # Import local modules
 from Palate import Palate
 from Nutrition import Nutrients
+from Nutrition import Nutrition_Score
 from Recommender import Recommend
 
 #Initialize application
@@ -33,8 +34,16 @@ def return_nutrients(string):
     #Nutrients module has a method called "fast filter" that seeks nutrition value from database
     return nuts.fast_filter(string)
 
-#Interface for palate module
+#Interface for nutrition estimation model
+@app.route('/get_score/<string>')
+def return_score(string):
+    age,gender,activity,food = string.split('|')
 
+    #Nutrients module has a method called "fast filter" that seeks nutrition value from database
+    nutrients = nuts.fast_filter(food)
+    return Nutrition_Score(int(age), int(gender), int(activity), nutrients).score
+
+#Interface for palate module
 @app.route('/get_palate/<string>')
 def return_palate(string):
     #Palate module has a method called "palette_constructor that decomposes foods into their palate signatures"
