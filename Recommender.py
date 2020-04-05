@@ -2,13 +2,13 @@ from scipy.spatial.distance import cosine
 from numpy import mean
 from Palate import Palate
 from GeoLocal import LocalFinder
+from DurhamFast import GeoLocalFast
 import json
-import math
+from math import radians, cos, sin, asin, sqrt
 import datetime
 
 '''
 This module is designed to be a simple implementation of our recommendation model, based on cosine distances.
-
 Created by Joshua D'Arcy, Sabrina Qi, and Aman Ibrahim on 2/27/2020
 '''
 
@@ -40,7 +40,8 @@ class Recommend:
 
     #Use LocalFinder to find local candidates
     def seek_local(self):
-        self.local_candidates = LocalFinder(self.latitude, self.longitude, self.distance).candidates
+        # self.local_candidates = LocalFinder(self.latitude, self.longitude, self.distance).candidates
+        self.local_candidates = GeoLocalFast(self.latitude, self.longitude, self.distance).candidates
 
         self.local_items = list(self.local_candidates.keys())
     
@@ -72,7 +73,8 @@ class Recommend:
             self.rec_dict[f'rec_{i}']['percent_match'] = percent
             self.rec_dict[f'rec_{i}']['restaurant'] = self.local_candidates[name]['restaurant']
             self.rec_dict[f'rec_{i}']['price'] = self.local_candidates[name]['price']
-            #self.rec_dict[f'rec_{i}']['distance'] = round(self.find_distance(self.local_candidates[name]['latitude'], self.local_candidates[name]['longitude']), 2)
+            self.rec_dict[f'rec_{i}']['distance'] = round(self.haversine(self.latitude, self.longitude, float(self.local_candidates[name]['latitude']), float(self.local_candidates[name]['longitude'])), 2)
+            self.rec_dict[f'rec_{i}']['description'] = self.local_candidates[name]['description']
             self.rec_dict[f'rec_{i}']['previous_match'] = self.user_hx[i]
 
 
@@ -80,26 +82,18 @@ class Recommend:
 
             i+=1
 
-    def find_distance(self, lat2, lon2): 
+    def haversine(self,lon1, lat1, lon2, lat2):
 
-        #radius of earth
-        R = 6373.0
+        # convert decimal degrees to radians 
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
-        #lat1 / lat2
-        lat1 = math.radians(self.latitude)
-        lon1 = math.radians(self.longitude)
-
-        #find deltas
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-
-        #Haversine formula 
-        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        distance = R * c
-
-        return distance
-
+        # haversine formula 
+        dlon = lon2 - lon1 
+        dlat = lat2 - lat1 
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a)) 
+        r = 6371 # Radius of earth in kilometers. Use 3956 for miles
+        return c * r
 
 
 

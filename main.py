@@ -55,13 +55,16 @@ def return_palate(string):
 @app.route('/get_rec', methods=['POST'])
 def return_recommendation():
     json_file = request.json
+    print(json_file)
     uhx = json_file["user_hx"]
     ulat = json_file["latitude"]
     ulon = json_file["longitude"]
     udis = json_file["distance"]
 
-    recommendation = Recommend(uhx, ulat, ulon, udis)
-    return recommendation.rec_dict
+    recommendation = Recommend(uhx, ulat, ulon, udis).rec_dict
+    stringed = json.dumps(recommendation)
+    
+    return stringed
 
 if __name__ == '__main__':
     #Do not use Flask in deployment. Set debug to False for real testing.
