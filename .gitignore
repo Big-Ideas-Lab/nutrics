@@ -1,4 +1,6 @@
 clean_foods.csv
+nutrics.db
+food.csv
 dconf
 .env
 __pycache__
