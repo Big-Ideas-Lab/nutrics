@@ -1,10 +1,6 @@
 '''
-This module is intended to break down foods into their palate signatures. 
-This will result in a lower dimensional space that is 
-a) easier to search and 
-b) contains only information we care about
-
-Created by Joshua D'Arcy on 2/27/2020.
+This module uses natural language processing to generate a "Palate signature" for faster computation.
+Created by Joshua D'Arcy on 4/15/2020.
 '''
 
 import pandas as pd

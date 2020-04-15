@@ -6,35 +6,30 @@ Welcome to the Nutrics project. We think that choosing nutritious, local food sh
 
 
 ```
-
 git clone 'https://github.com/Big-Ideas-Lab/nutrics.git'
 cd nutrics
 pip install -r requirements.txt
-python3 main.py
+FLASK_APP=run.py FLASK_DEBUG=1 flask run
 ```
 
-Note: clean_foods.csv is not hosted on this GitHub page. We do not have permission to distribute this dataset, as it doesn't belong to us. Please contact a member of the BIG IDEAs Lab for permission to access this dataset.
+Note: nutrics.db and clean_foods.csv are not hosted on this GitHub page. We do not have permission to distribute these datasets, as they don't belong to us. Please contact a member of the BIG IDEAs Lab for permissions. 
 
 ```
-
-Update 2.27.2020: Try these endpoints once you have flask running on a local server:
-
-{localhost}/get_nutrients/<string>
-{localhost}/get_palate/<string>
-
-Update 3.25.2020: This endpoint allows you to use the GeoLocal and Recommender Modules 
-to find local foods tailored to your palate. It requires a post API call with a .json file. 
-
-{localhost}/get_rec/<json>
+Update 4.15.2020: We restructured the backend and the previous endpoints no longer exist. Please check back in in the next few days when this README is updated. 
 ```
 
 -------------
 
+- [ ] README needs updating.
+
 ## **Backend API:**
 
-### main.py
+### app.py
 
-This file contains a Flask application. Think of it as the "hub" by which the other modules (Nutrition, Palate, Recommender, GeoLocal) connect and interact. main.py accepts and returns information to our Google Firestore where user data is held. 
+This file contains a Flask application. Think of it as our central hub that reroutes users based on their endpoint. 
+
+### models.py
+This file defines 
 
 ### Nutrition.py
 
@@ -45,14 +40,6 @@ This file contains two classes. The Nutrients class uses natural language proces
 ### Palate.py
 
 This file contains one class. The Palate class uses a dimensionality reduction technique we call "palate deconstruction". It reduces 300 dim embeddings to just 30 dim, based on the food's semantic relationship to different "flavors" defined in **flavors.pickle**. 300 dim embeddings for a large corpus are stored in **unique_foods.pickle** and are in {string:embedding} format.
-
-### GeoLocal.py
-
-This file contains a dummy class for now. Given a latitude, longitude, and radius, the GeoLocal class will find nearby candidate options for menu items within walkable distance.
-
-### Recommender.py
-
-This file contains our recommendation model. It contains a "Recommender" class that accepts a two datasets as inputs -- one representing a user's positive history, and one containing candidate values from GeoLocal.py. Recommender compares these two datasets and makes ranked recommendations based on cosine distance.
 
 ## Frontend (Mobile Application)
 
