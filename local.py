@@ -1,6 +1,6 @@
 '''
 This file is a second database manager for the food database 'nutrics.db'
-It is separate from the users database established in models.py.
+It is separate from the users database established in models.py. It was separated to more easily allow for updating databases.
 Created by Joshua D'Arcy on 4/15/2020.
 '''
 from sqlalchemy import create_engine, MetaData, Table
@@ -29,7 +29,6 @@ class nutrics_db:
             (lat-self.localfoods.c.latitude)*(lat-self.localfoods.c.latitude) + 
             (lon - self.localfoods.c.longitude)*(lon - self.localfoods.c.longitude)
             )).limit(1000)
-
 
         #connect to engine and execute the above query
         res = self.engine.connect().execute(query)

@@ -7,7 +7,6 @@ from flask import Flask
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
-import views, models, resources
 import os
 
 #initialize Flask
@@ -22,10 +21,13 @@ app.config['SECRET_KEY'] = os.urandom(24),
 #use ORM with SQLAlchemy
 db = SQLAlchemy(app)
 
+import views, models, resources
+
 #create all db tables before accepting first request in Flask
 @app.before_first_request
 def create_tables():
     db.create_all()
+
 
 #Assign secret key for JSON Web Tokens (JWT)
 app.config['JWT_SECRET_KEY'] = os.urandom(24)
@@ -35,11 +37,12 @@ jwt = JWTManager(app)
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
-
 # Can change time before tokens expire. Shorter times are more secure, longer times are more convenient.
 #  Default is 15 minutes and 1 day. 
 # app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta()
 # app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta()
+# import views, models, resources
+
 
 #Check if token was blacklisted
 @jwt.token_in_blacklist_loader
@@ -55,6 +58,10 @@ api.add_resource(resources.UserLogoutRefresh, '/logout/refresh')
 api.add_resource(resources.TokenRefresh, '/token/refresh')
 api.add_resource(resources.EditPreference, '/edit')
 api.add_resource(resources.GetUserPreference, '/prefs')
+api.add_resource(resources.Admin, '/admin')
 
 #convert to recommender_resources
 api.add_resource(resources.Recommender, '/recommendation')
+
+# if __name__ == "__main__":
+#     app.run("0.0.0.0", port=5001, debug=True)

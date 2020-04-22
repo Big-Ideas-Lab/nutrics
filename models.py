@@ -5,14 +5,19 @@ Created by Joshua D'Arcy on 4/15/2020.
 
 from run import db
 from passlib.hash import pbkdf2_sha256 as sha256
+from datetime import datetime
 
 class UserModel(db.Model):
 
     #establish table
     __tablename__ = 'users'
+
+    # User information
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(120), unique = True, nullable = False)
     password = db.Column(db.String(120), nullable = False)
+    role = db.Column(db.String(120), nullable = False)
+    joined = db.Column(db.String(120), nullable = False)
     
     #save user to database
     def save_to_db(self):
@@ -35,18 +40,17 @@ class UserModel(db.Model):
         return sha256.verify(password, hash)
     
     #method to retrieve all users
-    #make this an admin role only
     @classmethod
-    def return_all(cls):
+    def return_all_users(cls):
         def to_json(x):
             return {
                 'username': x.username,
-                'password': x.password
+                'date_joined': x.joined,
+                'role': x.role
             }
         return {'users': list(map(lambda x: to_json(x), UserModel.query.all()))}
 
     #method to delete all users
-    #make this an admin role only
     @classmethod
     def delete_all(cls):
         try:
@@ -56,21 +60,6 @@ class UserModel(db.Model):
         except:
             return {'message': 'Something went wrong with deleting the users. Please try again.'}
 
-#security class to blacklist tokens
-class RevokedTokenModel(db.Model):
-    __tablename__ = 'revoked_tokens'
-    id = db.Column(db.Integer, primary_key = True)
-    jti = db.Column(db.String(120))
-    
-    def add(self):
-        db.session.add(self)
-        db.session.commit()
-    
-    #class method decorator allows for JWT blacklist checking without instantiating class
-    @classmethod
-    def is_jti_blacklisted(cls, jti):
-        query = cls.query.filter_by(jti = jti).first()
-        return bool(query)
 
 #class for preferences model
 class PreferenceModel(db.Model): 
@@ -80,6 +69,7 @@ class PreferenceModel(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(120), nullable = False)
     preference = db.Column(db.String(120), nullable = False)
+    added = db.Column(db.String(120), nullable = False)
 
     #save preference to database
     #todo: add dates for preferences for analysis
@@ -100,10 +90,9 @@ class PreferenceModel(db.Model):
         except:
             return {'message': 'There was an error with removing the preference. Either it does not exist or there was a string matching issue.'}
 
-    #get list of all preferences from database (data dump)
-    #make administrator only 
+    #get list of all preferences from database for a given user (authentication required)
     @classmethod
-    def return_all(cls, username): 
+    def return_user_hx(cls, username): 
         def to_json(x): 
             return {
                 'username': x.username,
@@ -111,6 +100,28 @@ class PreferenceModel(db.Model):
             }
         return {'message': list(map(lambda x: to_json(x), PreferenceModel.query.filter_by(username = username).all()))}
 
-   
+    @classmethod
+    def data_dump(cls): 
+        def to_json(x): 
+            return {
+                'username': x.username, 
+                'preference': x.preference, 
+                'timestamp': x.added
+            }
+        return {'message': list(map(lambda x: to_json(x), PreferenceModel.query.all()))}
 
-
+#security class to blacklist tokens
+class RevokedTokenModel(db.Model):
+    __tablename__ = 'revoked_tokens'
+    id = db.Column(db.Integer, primary_key = True)
+    jti = db.Column(db.String(120))
+    
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    #class method decorator allows for JWT blacklist checking without instantiating class
+    @classmethod
+    def is_jti_blacklisted(cls, jti):
+        query = cls.query.filter_by(jti = jti).first()
+        return bool(query)

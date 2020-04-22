@@ -3,11 +3,9 @@ This module uses natural language processing to generate a "Palate signature" fo
 Created by Joshua D'Arcy on 4/15/2020.
 '''
 
-import pandas as pd
 import numpy as np
 import pickle
 from scipy import spatial
-import requests
 import json
 
 
