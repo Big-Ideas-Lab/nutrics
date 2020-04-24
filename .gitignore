@@ -6,3 +6,4 @@ dconf
 __pycache__
 DS_Store
 open_menu_Durham4km.pickle
+env.py

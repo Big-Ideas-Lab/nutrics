@@ -3,6 +3,15 @@ This file defines the resources used by the Flask application.
 Created by Joshua D'Arcy on 4/15/2020.
 '''
 
+
+'''
+Todo: 
+- Create dashboard for sqlite database (dump / add / etc). https://github.com/coleifer/sqlite-web
+- Finish email authentication
+- Add password reset option
+- fix salt and serializer for itsdangerous
+'''
+
 #flask imports
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt, get_current_user)
@@ -15,15 +24,18 @@ from local import nutrics_db
 from Palate import Palate
 pal = Palate()
 
+from itsdangerous import URLSafeTimedSerializer
 #cosine and json
 from scipy.spatial.distance import cosine
 import json
 
+from run import mail
+from flask_mail import Message 
 #create parser for incoming user data
 u_parser = reqparse.RequestParser()
 u_parser.add_argument('username', help = 'Username cannot be blank.', required = True)
+u_parser.add_argument('email', help = 'Please include a valid email address.', required = True)
 u_parser.add_argument('password', help = 'Please enter a valid password.', required = True)
-u_parser.add_argument('role', help = 'Sorry, that is not a valid role. Please enter "admin" or "user".', required = True)
 
 #create parser for incoming geolocal data
 r_parser = reqparse.RequestParser()
@@ -40,8 +52,27 @@ a_parser = reqparse.RequestParser()
 a_parser.add_argument('action', help = 'This field cannot be blank', required = True)
 a_parser.add_argument('new_admin', help = 'This field only needs to be filled when adding new admin.', required = False)
 
-#Approved list
-pre_approved = ['joshua', 'jessilyn']
+#email link parser
+e_parser = reqparse.RequestParser()
+e_parser.add_argument('token', help = 'include the token numnuts', required = True)
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer('secretkey')
+    return serializer.dumps(email, salt= 'alsosupersecret')
+
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer('secretkey')
+    try:
+        email = serializer.loads(
+            token,
+            salt='alsosupersecret',
+            max_age=expiration
+        )
+    except:
+        return False
+    return email
 
 #Register users
 class UserRegistration(Resource):
@@ -51,29 +82,53 @@ class UserRegistration(Resource):
         if UserModel.find_by_username(data['username']):
             return {'message': 'Username "{}" is already taken. Please choose another username.'.format(data['username'])}
         
+        if UserModel.find_by_email(data['email']):
+            return {'message': 'Email address "{}" is already taken. Please enter a different email address.'.format(data['email'])}
+
         new_user = UserModel(
-            username = UserModel.generate_hash(data['username')],
+            username = data['username'],
             password = UserModel.generate_hash(data['password']),
-            role = data['role'],
-            joined = str(datetime.utcnow())
+            email = data['email'],
+            admin = False,
+            registered_on = datetime.now(), 
+            confirmed = False, 
+            confirmed_on = None
         )
         
-        if new_user.role == 'admin' and new_user.username not in pre_approved:
-            return {
-                'message': 'You selected admin as a role, but are not on our approved list. Please email jessilyn.dunn@duke.edu for access.'
-            }
         #for better security, can limit refresh delta for refresh token. Or get rid of refresh priveleges altogether.
-        try:
-            new_user.save_to_db()
-            access_token = create_access_token(identity = data['username'])
-            refresh_token = create_refresh_token(identity = data['username'])
-            return {
-                'message': 'User {} was created with {} priveleges.'.format(data['username'], data['role']),
-                'access_token': access_token,
-                'refresh_token': refresh_token
+        # try:
+        new_user.save_to_db()
+        registration_token = generate_confirmation_token(new_user.email)
+
+        # access_token = create_access_token(identity = data['username'])
+        # refresh_token = create_refresh_token(identity = data['username'])
+        return {
+            'message': 'User {} was created. Please validate email.'.format(new_user.username),
+            'email_link': registration_token
+            # 'access_token': access_token,
+            # 'refresh_token': refresh_token
                 }
+        # except:
+        #     return {'message': 'Something went wrong with user registration.'}, 500
+
+class EmailVerification(Resource):
+    def post(self): 
+        data = e_parser.parse_args()
+        token = data['token']
+        try: 
+            email = confirm_token(token)
         except:
-            return {'message': 'Something went wrong with user registration.'}, 500
+            return {'message': 'Token is invalid or expired.'}
+
+        user = UserModel.find_by_email(email)
+        if user.confirmed:
+            return {'message': 'User has already been confirmed. Please login.'}
+        
+        else: 
+            user.confirmed = True
+            user.confirmed_on = datetime.now()
+            user.save_to_db()
+            return {'message':'Congrats! You can now log in.'}
 
 #todo: Need to build a method to reset / change password. Will require Flask - security (and an email?)
 #Login users and start session with access / refresh keys. Draws from models.UserModel
@@ -85,13 +140,24 @@ class UserLogin(Resource):
         if not current_user:
             return {'message': 'User {} doesn\'t exist. Are you trying to register? Go to the /registration endpoint.'.format(data['username'])}
         
+        if not current_user.confirmed:
+            return {'message': 'You need to register your email.'}
+            
         if UserModel.verify_hash(data['password'], current_user.password):
             access_token = create_access_token(identity = data['username'])
             refresh_token = create_refresh_token(identity = data['username'])
-            return {
-                'message': 'Logged in as {} ({}).'.format(current_user.username, current_user.role),
-                'access_token': access_token,
-                'refresh_token': refresh_token
+            
+            if current_user.admin == True:
+                return {
+                    'message': 'Logged in as {}. (admin)'.format(current_user.username),
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                    }
+            else: 
+                return {
+                    'message': 'Logged in as {} (user)'.format(current_user.username),
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
                 }
         else:
             return {'message': 'Something went wrong. Please check your password.'}
@@ -245,3 +311,9 @@ class Recommender(Resource):
         ndb.close_connection()
 
         return {'data': json.dumps(array)}
+
+class testmail(Resource):
+    def get(self):
+        msg = Message("hello", recipients=['joshuadrc@gmail.com'])
+        mail.send(msg)
+

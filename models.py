@@ -14,10 +14,14 @@ class UserModel(db.Model):
 
     # User information
     id = db.Column(db.Integer, primary_key = True)
+    email = db.Column(db.String(120), unique = True, nullable = False)
     username = db.Column(db.String(120), unique = True, nullable = False)
     password = db.Column(db.String(120), nullable = False)
-    role = db.Column(db.String(120), nullable = False)
-    joined = db.Column(db.String(120), nullable = False)
+
+    admin = db.Column(db.Boolean, nullable = False)
+    registered_on = db.Column(db.DateTime, nullable = False)
+    confirmed = db.Column(db.Boolean, nullable=False, default=False)
+    confirmed_on = db.Column(db.DateTime, nullable=True)
     
     #save user to database
     def save_to_db(self):
@@ -28,6 +32,10 @@ class UserModel(db.Model):
     @classmethod
     def find_by_username(cls, username):
         return cls.query.filter_by(username = username).first()
+    
+    @classmethod
+    def find_by_email(cls, email):
+        return cls.query.filter_by(email = email).first()
 
     #hash password 
     @staticmethod
@@ -59,7 +67,6 @@ class UserModel(db.Model):
             return {'message': '{} row(s) deleted'.format(num_rows_deleted)}
         except:
             return {'message': 'Something went wrong with deleting the users. Please try again.'}
-
 
 #class for preferences model
 class PreferenceModel(db.Model): 
