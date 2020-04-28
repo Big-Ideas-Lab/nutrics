@@ -3,8 +3,8 @@ This file defines is the main Flask hub.
 Created by Joshua D'Arcy on 4/15/2020.
 '''
 #get access to environment variables
-import env 
-
+import env
+import pymysql
 #import flask apps
 from flask import Flask
 from flask_restful import Api
@@ -21,8 +21,20 @@ api = Api(app)
 #configure Flask
 app.config['SECURITY_PASSWORD_SALT'] = 'supersecret'
 
-#configure sqlalchemy 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+# config = {
+#     'user': 'root',
+#     'password': 'root',
+#     'host': 'db',
+#     'port': '3306',
+#     'database': 'knights'
+# }
+# connection = mysql.connector.connect(**config)
+
+#configure sqlalchemy. From docker docs https://docs.docker.com/compose/networking/
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@db:3306/users'
+
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'supersecret',
 
@@ -36,6 +48,8 @@ app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_USERNAME')
 mail = Mail(app)
+
+
 #use ORM with SQLAlchemy
 db = SQLAlchemy(app)
 

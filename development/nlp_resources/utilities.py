@@ -5,33 +5,31 @@ Created by Joshua D'Arcy on 4/15/2020.
 
 import numpy as np
 import pickle
-from scipy import spatial
 import json
 
 
-# Unique foods is a python dictionary (in pickle format) that contains 300dim word embeddings (values) for many foods (keys)
-uniq_foods = 'unique_foods.pickle'
+class Distance:
+    @staticmethod
+    def cosine(vA, vB):
+        distance = 1 - np.dot(vA, vB) / (np.linalg.norm(vA) * np.linalg.norm(vB))
+        return distance
 
-# Flavors is a list of flavors that we use to deconstruct each meal into a flavor signature
-flavors = 'flavors.pickle'
+class Embed: 
 
-class Palate:
+    with open('nlp_resources/unique_foods.pickle', 'rb') as handle: 
+        dictionary = pickle.load(handle)
 
-    #Initialize
-    def __init__(self): 
-        with open(uniq_foods, 'rb') as handle: 
-            self.dictionary = pickle.load(handle)
+    with open('nlp_resources/flavors.pickle', 'rb') as handle: 
+        flavors = pickle.load(handle)
 
-        with open(flavors, 'rb') as handle: 
-            self.flavors = pickle.load(handle)
-
-    def palate_constructor(self,food_string, return_sum = True):
+    @classmethod
+    def palate(cls, food_string, return_sum = True):
 
         #Our dictionary is not exhaustive, and this function will skip over unknown foods / mispellings
         def attempt_cos(single_food, single_flavor):
             try:
-                cosine_distance = 1-spatial.distance.cosine(self.dictionary[single_food], self.dictionary[single_flavor])
-                return cosine_distance
+                cosine_distance = Distance.cosine(cls.dictionary[single_food], cls.dictionary[single_flavor])
+                return 1 - cosine_distance
             except:
                 return 0
             
@@ -45,9 +43,8 @@ class Palate:
 
         #split each meal into foods
         food_array = food_string.lower().split()
-        
 
-        palate_array = np.array([find_flavor_single(food, self.flavors) for food in food_array]).reshape(-1, len(self.flavors))
+        palate_array = np.array([find_flavor_single(food, cls.flavors) for food in food_array]).reshape(-1, len(cls.flavors))
 
         sum_palate_array = np.sum(palate_array, axis = 0)
         

@@ -21,12 +21,13 @@ from datetime import datetime
 #local imports
 from models import UserModel, RevokedTokenModel, PreferenceModel
 from local import nutrics_db
-from Palate import Palate
-pal = Palate()
+
+from nlp_resources.utilities import Distance
+from nlp_resources.utilities import Embed
 
 from itsdangerous import URLSafeTimedSerializer
 #cosine and json
-from scipy.spatial.distance import cosine
+
 import json
 
 from flask import url_for
@@ -295,7 +296,7 @@ class Recommender(Resource):
 
         #user history preferences
         prefs = [row['preference'] for row in rows['message']]
-        user_matrix = [pal.palate_constructor(item) for item in prefs]
+        user_matrix = [Embed.palate(item) for item in prefs]
 
         #local candidates, check out local.py for more.
         ndb = nutrics_db()
@@ -305,7 +306,7 @@ class Recommender(Resource):
         counter = 0
         #find best match
         for user_item in user_matrix: 
-            matches = [cosine(user_item, local) for local in local_matrix]
+            matches = [Distance.cosine(user_item, local) for local in local_matrix]
             best_match = min(matches)
             index_match = matches.index(best_match)
             name = local_items[index_match]

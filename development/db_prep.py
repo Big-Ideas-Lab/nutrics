@@ -33,8 +33,8 @@ from sqlite3 import Error
 import json
 import numpy as np
 
-from Palate import Palate
-pal = Palate()
+from nlp_resources.utilities import Embed
+from nlp_resources.utilities import Distance
 
 class db:
 
@@ -115,7 +115,7 @@ class db:
                         item = row[0]
 
                         #construct palate embedding
-                        palate = pal.palate_constructor(item)
+                        palate = Embed.palate(item)
                         #SQL doesn't accept arrays so need to serialize into JSON strings
                         jsoned = json.dumps(palate.tolist()) 
 

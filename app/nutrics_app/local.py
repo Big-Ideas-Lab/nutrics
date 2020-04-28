@@ -18,7 +18,7 @@ class nutrics_db:
         self.engine = create_engine('sqlite:///nutrics.db', convert_unicode=True)
         self.metadata = MetaData(bind=self.engine)
         #select DURHAM table, and autoload the columns contained within it
-        self.localfoods = Table('DURHAM', self.metadata, autoload=True)
+        self.localfoods = Table('FOOD_TABLE', self.metadata, autoload=True)
 
     def seek_local(self, lat, lon):
         #this query sorts the nearest (lat / lon) 1000 items in the database in ascending order (closest first)
