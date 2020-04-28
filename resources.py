@@ -96,7 +96,7 @@ class UserRegistration(Resource):
             email = data['email'],
             age = data['age'], 
             gender_identity = data['gender_identity'],
-            activty_level = data['activity_level'],
+            activity_level = data['activity_level'],
             admin = False,
             registered_on = datetime.now(), 
             confirmed = False, 
@@ -226,16 +226,15 @@ class Admin(Resource):
         current_user = get_jwt_identity()
         row = UserModel.find_by_username(current_user)
         #verify user with JWT is an admin via role column
-        if 'admin' not in row.role:
-            return {"msg": "Forbidden, your role is {}".format(row.role)}, 403
-        else:
+        if not row.admin:
+            return {"message": "Forbidden, you do not have admin privelages."}, 403
+        if row.admin:
             if action == 'get_users':
                 return UserModel.return_all_users()
             if action == 'get_preferences':
                 return PreferenceModel.data_dump()
-            if action == 'add_admin':
-                pre_approved.append(new_admin)
-                return {'message': 'Future user {} given admin privelage. Have them register now.'.format(new_admin)}
+            if action == 'update_admin':
+                return UserModel.make_admin(new_admin)
 
 
 #Class to edit preferences
@@ -247,7 +246,7 @@ class EditPreference(Resource):
         data = p_parser.parse_args()
         pref = data['preference']
         action = data['preference_action']
-        added = str(datetime.utcnow())
+        added = datetime.now()
         
         #get user identity from JSON web token
         user = get_jwt_identity()

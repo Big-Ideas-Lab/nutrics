@@ -24,6 +24,7 @@ class UserModel(db.Model):
 
     admin = db.Column(db.Boolean, nullable = False)
     registered_on = db.Column(db.DateTime, nullable = False)
+
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
     confirmed_on = db.Column(db.DateTime, nullable=True)
     
@@ -50,17 +51,25 @@ class UserModel(db.Model):
     @staticmethod
     def verify_hash(password, hash):
         return sha256.verify(password, hash)
-    
+
+    #method to add admin privelages to a user
+    @classmethod
+    def make_admin(cls,username):
+        new_admin = cls.query.filter_by(username=username).first()
+        new_admin.admin = True
+        db.session.commit()
+        return {'message': 'updated {} to have admin privelages.'.format(username)}
+
     #method to retrieve all users
     @classmethod
     def return_all_users(cls):
-        def to_json(x):
+        def jsonit(x):
             return {
                 'username': x.username,
-                'date_joined': x.joined,
-                'role': x.role
+                'date_joined': str(x.confirmed_on),
+                'admin': x.admin
             }
-        return {'users': list(map(lambda x: to_json(x), UserModel.query.all()))}
+        return {'users': list(map(lambda x: jsonit(x), UserModel.query.all()))}
 
     #method to delete all users
     @classmethod
@@ -80,7 +89,7 @@ class PreferenceModel(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(120), nullable = False)
     preference = db.Column(db.String(120), nullable = False)
-    added = db.Column(db.String(120), nullable = False)
+    added = db.Column(db.DateTime, nullable=False)
 
     #save preference to database
     #todo: add dates for preferences for analysis
@@ -107,7 +116,8 @@ class PreferenceModel(db.Model):
         def to_json(x): 
             return {
                 'username': x.username,
-                'preference': x.preference
+                'preference': x.preference,
+                'added': str(x.added)
             }
         return {'message': list(map(lambda x: to_json(x), PreferenceModel.query.filter_by(username = username).all()))}
 
@@ -117,7 +127,7 @@ class PreferenceModel(db.Model):
             return {
                 'username': x.username, 
                 'preference': x.preference, 
-                'timestamp': x.added
+                'timestamp': str(x.added)
             }
         return {'message': list(map(lambda x: to_json(x), PreferenceModel.query.all()))}
 
