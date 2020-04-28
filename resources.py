@@ -29,7 +29,9 @@ from itsdangerous import URLSafeTimedSerializer
 from scipy.spatial.distance import cosine
 import json
 
-from run import mail
+from flask import url_for
+
+from run import app, mail
 from flask_mail import Message 
 #create parser for incoming user data
 u_parser = reqparse.RequestParser()
@@ -57,7 +59,7 @@ a_parser.add_argument('new_admin', help = 'This field only needs to be filled wh
 
 #email link parser
 e_parser = reqparse.RequestParser()
-e_parser.add_argument('token', help = 'include the token numnuts', required = True)
+e_parser.add_argument('token', help = 'include the token.', required = True)
 
 
 def generate_confirmation_token(email):
@@ -105,12 +107,21 @@ class UserRegistration(Resource):
         # try:
         new_user.save_to_db()
         registration_token = generate_confirmation_token(new_user.email)
+        clickable = url_for('emailverification', token = registration_token, _external = True)
+
+        msg = Message(
+            subject='Verification link for nutrics',
+            recipients=[new_user.email],
+            body=clickable,
+            sender=app.config['MAIL_DEFAULT_SENDER']
+            )
+        mail.send(msg)
 
         # access_token = create_access_token(identity = data['username'])
         # refresh_token = create_refresh_token(identity = data['username'])
         return {
-            'message': 'User {} was created. Please validate email.'.format(new_user.username),
-            'email_link': registration_token
+            'message': 'User {} was created. Validation link sent to email.'.format(new_user.username),
+            'email_sent_to': new_user.email
             # 'access_token': access_token,
             # 'refresh_token': refresh_token
                 }
@@ -118,7 +129,7 @@ class UserRegistration(Resource):
         #     return {'message': 'Something went wrong with user registration.'}, 500
 
 class EmailVerification(Resource):
-    def post(self): 
+    def get(self): 
         data = e_parser.parse_args()
         token = data['token']
         try: 
