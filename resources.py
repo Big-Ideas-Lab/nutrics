@@ -36,6 +36,9 @@ u_parser = reqparse.RequestParser()
 u_parser.add_argument('username', help = 'Username cannot be blank.', required = True)
 u_parser.add_argument('email', help = 'Please include a valid email address.', required = True)
 u_parser.add_argument('password', help = 'Please enter a valid password.', required = True)
+u_parser.add_argument('age', help = 'Please enter an age.', required = True)
+u_parser.add_argument('gender_identity', help = 'Please enter an age.', required = True)
+u_parser.add_argument('activity_level', help = 'We need your activity level for nutritious recommendations.', required = True)
 
 #create parser for incoming geolocal data
 r_parser = reqparse.RequestParser()
@@ -89,6 +92,9 @@ class UserRegistration(Resource):
             username = data['username'],
             password = UserModel.generate_hash(data['password']),
             email = data['email'],
+            age = data['age'], 
+            gender_identity = data['gender_identity'],
+            activty_level = data['activity_level'],
             admin = False,
             registered_on = datetime.now(), 
             confirmed = False, 

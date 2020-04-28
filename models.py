@@ -18,6 +18,10 @@ class UserModel(db.Model):
     username = db.Column(db.String(120), unique = True, nullable = False)
     password = db.Column(db.String(120), nullable = False)
 
+    age = db.Column(db.Integer, nullable = False)
+    activity_level = db.Column(db.Integer, nullable = False)
+    gender_identity = db.Column(db.Integer, nullable = False)
+
     admin = db.Column(db.Boolean, nullable = False)
     registered_on = db.Column(db.DateTime, nullable = False)
     confirmed = db.Column(db.Boolean, nullable=False, default=False)

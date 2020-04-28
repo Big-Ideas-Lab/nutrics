@@ -6,7 +6,7 @@ between different foods and estimate their nutritional value based on nearest ne
 The Nutrition_Score was created to score a food based on it's nutritional content and takes
 gender, age, and activity level into account. 
 
-Created by Joshua D'Arcy and Sabrina Qi on 2/27/2020.
+Created by Sabrina Qi and Joshua D'Arcy on 2/27/2020.
 '''
 
 import pandas as pd
