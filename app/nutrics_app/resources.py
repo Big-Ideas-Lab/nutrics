@@ -3,65 +3,31 @@ This file defines the resources used by the Flask application.
 Created by Joshua D'Arcy on 4/15/2020.
 '''
 
-
 '''
 Todo: 
-- Create dashboard for sqlite database (dump / add / etc). https://github.com/coleifer/sqlite-web
-- Finish email authentication
 - Add password reset option
 - fix salt and serializer for itsdangerous
 '''
 
 #flask imports
-from flask_restful import Resource, reqparse
+from flask_restful import Resource
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt, get_current_user)
-# from flask_user import roles_required
-from datetime import datetime
+from flask_mail import Message 
+from flask import url_for
 
 #local imports
 from models import UserModel, RevokedTokenModel, PreferenceModel
+from request_parsers import u_parser, p_parser, a_parser, r_parser, e_parser
 from local import nutrics_db
-
 from nlp_resources.utilities import Distance
 from nlp_resources.utilities import Embed
-
-from itsdangerous import URLSafeTimedSerializer
-#cosine and json
-
-import json
-
-from flask import url_for
-
+from Recommender import Recommendations
 from run import app, mail
-from flask_mail import Message 
-#create parser for incoming user data
-u_parser = reqparse.RequestParser()
-u_parser.add_argument('username', help = 'Username cannot be blank.', required = True)
-u_parser.add_argument('email', help = 'Please include a valid email address.', required = True)
-u_parser.add_argument('password', help = 'Please enter a valid password.', required = True)
-u_parser.add_argument('age', help = 'Please enter an age.', required = True)
-u_parser.add_argument('gender_identity', help = 'Please enter an age.', required = True)
-u_parser.add_argument('activity_level', help = 'We need your activity level for nutritious recommendations.', required = True)
 
-#create parser for incoming geolocal data
-r_parser = reqparse.RequestParser()
-r_parser.add_argument('latitude', help= 'Latitude parameter is required.', required = True)
-r_parser.add_argument('longitude', help= 'Longitude paramter is required.', required = True)
-
-#Preference parser
-p_parser = reqparse.RequestParser()
-p_parser.add_argument('preference', help = 'This field cannot be blank', required = True)
-p_parser.add_argument('preference_action', help = 'This field cannot be blank', required = True)
-
-#Admin parser
-a_parser = reqparse.RequestParser()
-a_parser.add_argument('action', help = 'This field cannot be blank', required = True)
-a_parser.add_argument('new_admin', help = 'This field only needs to be filled when adding new admin.', required = False)
-
-#email link parser
-e_parser = reqparse.RequestParser()
-e_parser.add_argument('token', help = 'include the token.', required = True)
-
+#general python helpers
+from datetime import datetime
+from itsdangerous import URLSafeTimedSerializer
+import json
 
 def generate_confirmation_token(email):
     serializer = URLSafeTimedSerializer('secretkey')
@@ -292,45 +258,14 @@ class Recommender(Resource):
 
         #access user from indexed JSON web token
         username = get_jwt_identity()
-        rows = PreferenceModel.return_user_hx(username)
 
-        #user history preferences
-        prefs = [row['preference'] for row in rows['message']]
-        user_matrix = [Embed.palate(item) for item in prefs]
+        #use Recommender Module
+        recs = Recommendations.match(username, latitude, longitude)
 
-        #local candidates, check out local.py for more.
-        ndb = nutrics_db()
-        local_matrix, local_items, keys = ndb.seek_local(latitude,longitude)
+        #return data
+        return {'data': json.dumps(recs)}
 
-        array = []
-        counter = 0
-        #find best match
-        for user_item in user_matrix: 
-            matches = [Distance.cosine(user_item, local) for local in local_matrix]
-            best_match = min(matches)
-            index_match = matches.index(best_match)
-            name = local_items[index_match]
-            key = keys[index_match]
-            name, latitude, longitude, rest, desc, price, embed = ndb.return_info(name,key)
-            array.append(
-                {
-                    "item_name": name,
-                    "description": desc,
-                    "location": [float(latitude),float(longitude)],
-                    "restaurant": rest,
-                    "price": price,
-                    "previous_item": prefs[counter],
-                    "embedding":embed
-                }
-            )
-            counter += 1
-        #close connection to ndb
-        ndb.close_connection()
 
-        return {'data': json.dumps(array)}
 
-class testmail(Resource):
-    def get(self):
-        msg = Message("hello", recipients=['joshuadrc@gmail.com'])
-        mail.send(msg)
+
 

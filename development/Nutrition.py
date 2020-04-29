@@ -7,6 +7,10 @@ The Nutrition_Score was created to score a food based on it's nutritional conten
 gender, age, and activity level into account. 
 
 Created by Sabrina Qi and Joshua D'Arcy on 2/27/2020.
+
+
+**** WARNING ****
+This is a deprecated method. Needs plenty of work and was not a priority for the backend.
 '''
 
 import pandas as pd
@@ -17,10 +21,10 @@ import requests
 import json
 
 # Unique foods is a python dictionary (in pickle format) that contains 300dim word embeddings (values) for many foods (keys)
-uniq_foods = 'unique_foods.pickle'
+uniq_foods = 'nlp_resources/unique_foods.pickle'
 
 # clean_csv is a nutrition dataset that has been removed of duplicates and pre-processed for text analysis 
-clean_csv = 'clean_foods.csv'
+clean_csv = 'nlp_resources/clean_foods.csv'
 
 class Nutrients: 
 
@@ -143,8 +147,8 @@ class Nutrition_Score:
         self.activity = activity
 
         self.recommended = self.recommended_dict()
-        # to_score = Nutrients().fast_filter(food)
-        self.score = self.nutrientScore(food, self.recommended)
+        to_score = Nutrients().fast_filter(food)
+        self.score = self.nutrientScore(to_score, self.recommended)
 
     # #Score menu item
     # #---------------------------------------------------------------------------------------------
@@ -152,8 +156,6 @@ class Nutrition_Score:
         #convert to json file
         nutrition_info = json.loads(nutrition_info)
     
-
-
         recDict = recommended_dict_i
 
 

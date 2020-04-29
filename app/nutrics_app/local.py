@@ -3,6 +3,7 @@ This file is a second database manager for the food database 'nutrics.db'
 It is separate from the users database established in models.py. It was separated to more easily allow for updating databases.
 Created by Joshua D'Arcy on 4/15/2020.
 '''
+
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy import Table
 from sqlalchemy import select
@@ -23,7 +24,7 @@ class nutrics_db:
     def seek_local(self, lat, lon):
         #this query sorts the nearest (lat / lon) 1000 items in the database in ascending order (closest first)
         #What it does: Every query gets a response. No matter how far away someone is from the nearest known item.
-        #What it doesn't: Return queries ONLY within a certain radius. If you want this, you will need to look into Haversine formula and do some geometry. 
+        #What it doesn't: Return queries ONLY within a certain radius. If you want this, you will need to look into Haversine formula. 
 
         query = select([self.localfoods.c.item_name, self.localfoods.c.embedding, self.localfoods.c.latitude]).order_by(asc(
             (lat-self.localfoods.c.latitude)*(lat-self.localfoods.c.latitude) + 

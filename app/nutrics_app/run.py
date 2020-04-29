@@ -21,19 +21,11 @@ api = Api(app)
 #configure Flask
 app.config['SECURITY_PASSWORD_SALT'] = 'supersecret'
 
-# config = {
-#     'user': 'root',
-#     'password': 'root',
-#     'host': 'db',
-#     'port': '3306',
-#     'database': 'knights'
-# }
-# connection = mysql.connector.connect(**config)
+#configure sqlalchemy for mysql in parallel docker. From docker docs https://docs.docker.com/compose/networking/
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@db:3306/users'
 
-#configure sqlalchemy. From docker docs https://docs.docker.com/compose/networking/
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@db:3306/users'
-
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+#configure sqlalchemy to just use a local sqlite3 file
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'supersecret',
@@ -107,7 +99,6 @@ api.add_resource(resources.EditPreference, '/edit')
 api.add_resource(resources.GetUserPreference, '/prefs')
 api.add_resource(resources.Admin, '/admin')
 api.add_resource(resources.EmailVerification, '/verification')
-api.add_resource(resources.testmail, '/mail')
 
         #convert to recommender_resources
 api.add_resource(resources.Recommender, '/recommendation')

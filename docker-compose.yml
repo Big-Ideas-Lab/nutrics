@@ -1,5 +1,7 @@
 version: "2"
+
 services:
+
   app:
     build: ./app
     depends_on:
@@ -15,6 +17,5 @@ services:
       - "3306:3306"
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-
     volumes:
       - ./db:/docker-entrypoint-initdb.d/:ro
