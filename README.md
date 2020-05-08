@@ -11,8 +11,6 @@ cd nutrics
 pip install -r requirements.txt
 FLASK_APP=run.py FLASK_DEBUG=1 flask run
 ```
-
-
 > Updated by Joshua D'Arcy on 5.8.2020
 
 -------------
@@ -97,6 +95,10 @@ This file contains a Flask application and RESTful API logic. Think of it as our
 5. unique_foods.pickle
 
    unique_foods is a Python dictionary of several thousand food items with a 300 dim vector representation from the Google News Corpus. They are organized as key:value pairs (food:vector). They were put in a python dictionary to limit the number of vectors from the Google News Corpus, and thus can load much more quickly (file size 1.5GB to 3.5 MB)
+
+### Demo.ipynb
+
+This is a jupyter notebook that uses each of the above described modules and endpoints for demonstration purposes. **NOTE**: Change the administrator password prior to production, since it is included in this demo.
 
 ## Frontend (Mobile Application)
 
