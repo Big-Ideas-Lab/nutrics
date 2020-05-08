@@ -52,15 +52,15 @@ This file contains a Flask application and RESTful API logic. Think of it as our
 
 | Class | Authorization Header | Endpoint | Required Params | 
 | ------------- |:-------------:| :-----:| :-----:|
-| UserRegistration | Open | *~/registration* | username (string)\ password (string)\ email (string)\ age (int)\ gender_identity (int)\ activity_level (int) |
-| UserLogin | JWT required | *~/login* | username (string)\ password (string) |
+| UserRegistration | Open | *~/registration* | username (string), password (string), email (string), age (int), gender_identity (int), activity_level (int) |
+| UserLogin | JWT required | *~/login* | username (string), password (string) |
 | UserLogoutAccess | JWT required | *~/logout/access* | None |
 | UserLogoutRefresh | JWT required |*~/logout/refresh* | None |
 | TokenRefresh | JWT required | *~/token/refresh* | None |
 | GetUserPreference | JWT required | *~/prefs* | None
-| EditPreference | JWT required | *~/edit* | preference (string)\ preference_action ('add' or 'remove') |
+| EditPreference | JWT required | *~/edit* | preference (string), preference_action ('add' or 'remove') |
 | EmailVerification | JWT required | *~/verification* | clickable URL |
-| Recommender | JWT required | *~/recommendation* | latitude (float)\ longitude (float)\ distance (m) (float) |
+| Recommender | JWT required | *~/recommendation* | latitude (float), longitude (float), distance (m) (float) |
 
 2. AdminResources.py
    
@@ -72,9 +72,9 @@ This file contains a Flask application and RESTful API logic. Think of it as our
 | AdminUserPreferences | JWT required | *~/admin/user/preferences* | None |
 | AdminAccess | JWT required | *~/admin/access* | new_admin (string) |
 | AdminFoodDump | JWT required | *~/admin/food/dump* | None |
-| AdminFoodAdd | JWT required | *~/admin/food/add* | item_name (string)\ latitude (float)\ longitude (float)\ restaurant_name (string)\ item_description (string)\ price (float)\ nutrition (JSON string) |
-| AdminFoodEdit | JWT required | *~/admin/food/edit* | item_name (string)\ latitude (float)\ longitude (float)\ restaurant_name (string)\ item_description (string)\ price (float)\ nutrition (JSON string) | 
-| AdminFoodRemove | JWT required | *~/admin/food/remove* | item_name (string) latitude (float) longitude (float) |
+| AdminFoodAdd | JWT required | *~/admin/food/add* | item_name (string), latitude (float), longitude (float), restaurant_name (string), item_description (string), price (float), nutrition (JSON string) |
+| AdminFoodEdit | JWT required | *~/admin/food/edit* | item_name (string), latitude (float), longitude (float), restaurant_name (string), item_description (string), price (float), nutrition (JSON string) | 
+| AdminFoodRemove | JWT required | *~/admin/food/remove* | item_name (string), latitude (float), longitude (float) |
 
 
 ### Utilities
