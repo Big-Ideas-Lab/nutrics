@@ -13,98 +13,91 @@ conda activate nutrics
 FLASK_APP=run.py FLASK_DEBUG=1 flask run
 ```
 
-> Note: nutrics.db is not hosted on this GitHub page. We do not have permission to distribute this dataset, as much of the data in it doesn't belong to us. Please contact a member of the BIG IDEAs Lab for permission, or feel free to create your own using db_prep.py.
 
-> Updated by Joshua D'Arcy on 4.22.2020
-
--------------
-
-## Server API **Preparation:**
+> Updated by Joshua D'Arcy on 5.8.2020
 
 -------------
 
-In order to keep our production API response times as quick as possible, the nutrics.db database is constructed offline using modules developed by the BIG IDEAs Lab. These modules include Nutrition.py and Palate.py. A file called db_prep.py offers a streamlined terminal application to facilitate this process.
-
-### Nutrition.py
-
-This file contains two classes. The Nutrients class uses natural language processing to estimate the nutritional value of food, and uses **clean_foods.csv**, which we were lended by Duke Nutrition. The Nutrition_Score class takes those nutrition estimates and gives a score that is related to gender, age, and activity level.
-
-> Note: clean_foods.csv is not hosted on this GitHub page. We do not have permission to distribute this dataset, as it doesn't belong to us. Please contact a member of the BIG IDEAs Lab for permission to access this dataset.
-
-### Palate.py
-
-This file contains one class. The Palate class uses a dimensionality reduction technique we call "palate deconstruction". It reduces 300 dim embeddings to just 30 dim, based on the food's semantic relationship to different "flavors" defined in **flavors.pickle**.
-
-### db_prep.py
-This file contains one class, and depends on the Nutrition.py and Palate.py modules described above. It accepts one argument in the form of a csv file with columns defined below. It returns a sqlite3 database with additional columns for a nutrition score (provided by Nutrition.py) and an embedded representation of the food item (provided by Palate.py). Each row of the returned sqlite3 database contains the following information: 
-
-1. food_item
-2. food_description
-3. restaurant_name
-4. latitude
-5. longitude
-6. price
-7. palate
-8. nutrition
-
-### Example
-```
-#Build a csv file with the above 8 headers and copy it into the nutrics folder.
-
-#navigate to nutrics folder
->> cd nutrics
-
-#run conversion pipeline code
->> python db_prep.py [CSVFILENAME].csv
-
-#check directory, there should be a recently added 'nutrics.db'
-```
-
-> The API is dependent on nutrics.db. Ensure it is within the same directory for the Docker container to successfully initialize.
+## API
 
 -------------
 
-## Server API **Production:**
+#### run.py
 
--------------
+This file contains a Flask application and RESTful API logic. Think of it as our central hub that reroutes users to their chosen endpoints. The API constructs and manages a database named "app.db". app.db is defined in **models**, controlled by **resources**, and connected by **endpoints** in run.py.
 
-### app.py
+### Models
 
-This file contains a Flask application and RESTful API logic. Think of it as our central hub that reroutes users based on their chosen endpoint. The API constructs and manages a separate online database named "app.db". app.db is defined in models.py, and controlled by resources.py.
-
-#### models.py
- This file defines our user model, preference model, and token model. Each model is a class with various convenience methods. This file forms the "Model" in the classic model-view-controller (MVC) design. Models include: 
-
-1. UserModel
+1. UserModel.py
    
-   UserModel coordinates with the 'users' table in our app.db. It handles user access data (registration / login / tokens / authorized roles).
+   UserModel coordinates with the 'users' table in our app.db. It handles user access data and login / registration / session management / tokens.
 
-2. PreferenceModel
+2. PreferenceModel.py
 
-    PreferenceModel coordinates with the 'user_preferences' table in our app.db. It handles user preference data (historical items the user has enjoyed).
+   PreferenceModel coordinates with the 'user_preferences' table in our app.db. It handles user preference data (historical items the user has enjoyed).
 
-3. RevokedTokenModel
+3. FoodModel.py
+
+   FoodModel coordinates with the 'food' table in our app.db. FoodModel builds and adds convenience functions to edit our database of local items to offer.
+
+4. RevokedTokenModel.py
    
    RevokedTokenModel coordinates with the 'revoked_tokens' table in our app.db. It allows us to blacklist tokens and adds another layer of security to our application.
 
+### Resources
 
-#### resources.py
-This file defines resources and aligns with the Flask endpoints identified in app.py. Think of it as the "C" or "Controller" in the MVC pattern. All endpoints are POST calls with parameters identified below. JWT stands for JSON web token, and more information can be found [here](https://jwt.io/introduction/). Our resources include:
+1. UserResources.py
+   
+   UserResources defines resources accessible by any user (including admins). Classes (tied to **endpoints** in run.py) are defined in this table:
 
-| Resource | Authorization Header | Endpoint | Required Params | 
+| Class | Authorization Header | Endpoint | Required Params | 
 | ------------- |:-------------:| :-----:| :-----:|
-| UserRegistration | Open | *~/registration* | username / password / role|
-| UserLogin | JWT required | *~/login* | username / password |
+| UserRegistration | Open | *~/registration* | username (string)\ password (string)\ email (string)\ age (int)\ gender_identity (int)\ activity_level (int) |
+| UserLogin | JWT required | *~/login* | username (string)\ password (string) |
 | UserLogoutAccess | JWT required | *~/logout/access* | None |
 | UserLogoutRefresh | JWT required |*~/logout/refresh* | None |
 | TokenRefresh | JWT required | *~/token/refresh* | None |
 | GetUserPreference | JWT required | *~/prefs* | None
-| EditPreference | JWT required | *~/edit* | preference / preference_action
-| Admin  | JWT w/Admin access required | *~/admin* | action
+| EditPreference | JWT required | *~/edit* | preference (string)\ preference_action ('add' or 'remove') |
+| EmailVerification | JWT required | *~/verification* | clickable URL |
+| Recommender | JWT required | *~/recommendation* | latitude (float)\ longitude (float)\ distance (m) (float) |
+
+2. AdminResources.py
+   
+   AdminResources defines resources accessible by only those with **admin privelages**. Classes (tied to **endpoints** in run.py) are defined in this table:
+
+| Class | Authorization Header | Endpoint | Required Params | 
+| ------------- |:-------------:| :-----:| :-----:|
+| AdminUserInfo | JWT required | *~/admin/user/info* | None |
+| AdminUserPreferences | JWT required | *~/admin/user/preferences* | None |
+| AdminAccess | JWT required | *~/admin/access* | new_admin (string) |
+| AdminFoodDump | JWT required | *~/admin/food/dump* | None |
+| AdminFoodAdd | JWT required | *~/admin/food/add* | item_name (string)\ latitude (float)\ longitude (float)\ restaurant_name (string)\ item_description (string)\ price (float)\ nutrition (JSON string) |
+| AdminFoodEdit | JWT required | *~/admin/food/edit* | item_name (string)\ latitude (float)\ longitude (float)\ restaurant_name (string)\ item_description (string)\ price (float)\ nutrition (JSON string) | 
+| AdminFoodRemove | JWT required | *~/admin/food/remove* | item_name (string) latitude (float) longitude (float) |
 
 
-### nutrics_database_manager.py
-This file acts as a database manager for the nutrics.db we defined in the "preperation" stage. It is wrapped in a [SQLAlchemy](https://www.sqlalchemy.org/) application that allows for ORM database references. It contains a single class that allows us to interface with models.py and resources.py. It was separated from app.db to allow for modularity and updatability, and to help isolate user information in their own protected database.
+### Utilities
+
+1. natural_language.py
+
+   natural_language contains two classes to assist with our natural language processing -- Distance and Embed. Distance is a simple numpy implementation for cosine similarity (or difference if you choose) between two vectors. Embed is an implementation of our palate reduction technique, which is a dimensionality reduction method we developed to compress 300 dim food representations to just 30 dim vectors. The smaller vector size allows for non-abritrary optimizations in our recommendation model.
+
+2. nutrition_scoring.py
+
+   nutrition_scoring contains one class (Nutrition_Score) that scores a food item's nutritional value (from FoodModel) based on age, gender identity, and activity level. The model was developed by Sabrina Qi with guidance from Duke Nutrition. The more positive (less negative) a score is, the more nutritional value the food has for you. 
+
+3. request_parsers.py
+
+   request_parsers were abstracted out from our resources file for readability.
+
+4. flavors.pickle
+
+   flavors.pickle is a Python list of ~30 palate features (umami, sweet, salty, etc) that we use for our dimensionality reduction technique.
+
+5. unique_foods.pickle
+
+   unique_foods is a Python dictionary of several thousand food items with a 300 dim vector representation from the Google News Corpus. They are organized as key:value pairs (food:vector). They were put in a python dictionary to limit the number of vectors from the Google News Corpus, and thus can load much more quickly (file size 1.5GB to 3.5 MB)
 
 ## Frontend (Mobile Application)
 

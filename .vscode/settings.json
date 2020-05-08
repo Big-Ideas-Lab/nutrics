@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/joshua/miniconda3/envs/nutrics/bin/python",
+    "python.pythonPath": "/Users/joshuadarcy/miniconda3/envs/nutrics/bin/python",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": false
