@@ -27,7 +27,7 @@ p_parser.add_argument('preference_action', help = 'This field cannot be blank', 
 
 #Admin parser
 a_parser = reqparse.RequestParser()
-a_parser.add_argument('action', help = 'This field cannot be blank', required = True)
+a_parser.add_argument('action', help = 'This field cannot be blank', required = False)
 a_parser.add_argument('new_admin', help = 'This field only needs to be filled when adding new admin.', required = False)
 a_parser.add_argument('item_name', help = 'This field needs to be added when updating food table', required = False)
 a_parser.add_argument('latitude', help = 'This field needs to be added when updating food table', required = False)
