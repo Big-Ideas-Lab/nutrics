@@ -108,3 +108,4 @@ api.add_resource(AdminResources.AdminAccess, '/admin/access') #Admin endpoint to
 api.add_resource(AdminResources.AdminFoodDump, '/admin/food/dump') #Admin endpoint to data dump all foods in database
 api.add_resource(AdminResources.AdminFoodAdd, '/admin/food/add') #Admin endpoint to add food items to database
 api.add_resource(AdminResources.AdminFoodEdit, '/admin/food/edit') #Admin endpoint to edit or remove food items in database
+api.add_resource(AdminResources.AdminFoodRemove, '/admin/food/remove') #Admin endpoint to edit or remove food items in database

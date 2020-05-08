@@ -115,6 +115,10 @@ class FoodModel(db.Model):
     #Admin method to remove food items in database.
     @classmethod
     def remove_food(cls, food):
-        food_row = cls.query.filter_by(item_name = food.item_name, latitude = food.latitude, longitude = food.longitude).first()
-        food_row.delete()
-        return {'message': '{} at {}, {} successfully deleted.'.format(food.item_name, food.latitude, food.longitude)}
+        try:
+            db.session.query(FoodModel).filter(FoodModel.item_name==food.item_name).filter(FoodModel.latitude==food.latitude).filter(FoodModel.longitude==food.longitude).delete()
+            db.session.commit()
+            return {'message': '{} at {}, {} successfully deleted.'.format(food.item_name, food.latitude, food.longitude)}, 200
+        except:
+            return {'message': 'There was an error with removing the fodo item. Either it does not exist or there was a string matching issue.'}
+       

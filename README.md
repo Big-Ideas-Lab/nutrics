@@ -8,8 +8,7 @@ Welcome to the Nutrics project. We think that choosing nutritious, local food sh
 ```
 git clone 'https://github.com/Big-Ideas-Lab/nutrics.git'
 cd nutrics
-conda create --name nutrics --file requirements.txt
-conda activate nutrics
+pip install -r requirements.txt
 FLASK_APP=run.py FLASK_DEBUG=1 flask run
 ```
 
