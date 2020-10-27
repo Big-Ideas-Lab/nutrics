@@ -2,7 +2,7 @@ aniso8601==8.0.0
 blinker==1.4
 cffi==1.14.0
 click==7.1.2
-cryptography==2.9.2
+cryptography==3.2
 Flask==1.1.2
 Flask-JWT-Extended==3.24.1
 Flask-Mail==0.9.1
